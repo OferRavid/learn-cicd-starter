@@ -36,10 +36,18 @@ jobs:
         uses: 'google-github-actions/setup-gcloud@v3'
 
       - name: 'Build Docker image and push to Google Artifact Registry'
-        run: gcloud builds submit --tag us-central1-docker.pkg.dev/notely-492601/notely-ar-repo/notely:latest .
+        run: gcloud builds submit --tag us-central1-docker.pkg.dev/engaged-context-493319-h9/notely-ar-repo/notely:latest .
 
       - name: Migrate up the database
         run: ./scripts/migrateup.sh
 
       - name: Deploy to Cloud Run
-        run: gcloud run deploy notely --image us-central1-docker.pkg.dev/notely-492601/notely-ar-repo/notely:latest --region us-central1 --allow-unauthenticated --project notely-492601 --max-instances=4
+        run: |
+          gcloud run deploy notely \
+            --image us-central1-docker.pkg.dev/engaged-context-493319-h9/notely-ar-repo/notely:latest \
+            --region us-central1 \
+            --allow-unauthenticated \
+            --project engaged-context-493319-h9 \
+            --max-instances=4 \
+            --service-account="cloud-run-deployer@engaged-context-493319-h9.iam.gserviceaccount.com" \
+            --set-secrets="DATABASE_URL=notely_db_password:latest"
